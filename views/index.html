@@ -12,8 +12,18 @@
     <h2>This is the Cognitiva Speech to Text Demo!</h2>
     <p>Let's hope it works.</p>
 
+    <form action="" id="message-form">
+      <input type="text" name="message" placeholder="Message..."/>
+      <button>Send</button>
+    </form>
+
+    <ol id="messages">
+
+    </ol>
+
 
     <script src="javascripts/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
 
 
@@ -28,20 +38,39 @@
           console.log("Message recieved in client");
         });
 
-        /*
+        /*------This is how EVENT ACKNOWLEDGMENTS work ---------
         socket.emit('createMessage', {
           text:"John",
           from:"Mike"
+        }, function(data){ //callback for Ev. Ack. //data parameter comes from callback(data)
+          console.log("I got it",data);
         })
+
         */
       });
 
       //---------- Event Listeners ----------
       socket.on('newMessage', function(data) {
         console.log("New message: ",data);
+
+        var li = $("<li></li>");
+        li.text(`${data.from}: ${data.text}`)
+
+        $('#messages').append(li);
       })
       socket.on('disconnect', function() {
         console.log("Disconnected from server");
+      });
+
+      $("#message-form").on('submit',function(e){
+        e.preventDefault();
+
+        socket.emit('createMessage', {
+          from:"User",
+          text:$('[name=message]').val()
+        },function(){
+
+        })
       })
 
 

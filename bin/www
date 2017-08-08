@@ -56,11 +56,14 @@ io.on('connection', function (socket) {
     console.log("\nSocket disconnected");
   });
 
-  socket.on('createMessage', function(message){
+  socket.on('createMessage', function(message,callback){
+
     console.log('createMessage event listened',message);
     //Cuando me llega un mail o mensaje, envío a todos los ususarios el update
 
     io.emit('newMessage',generateMessage(message.from,message.text))
+    
+    callback('This is from the server');
     /*
     //Cuando me llega un mail o mensaje, envío a todos los ususarios MENOS A MI
     socket.broadcast.emit('newMessage',{
