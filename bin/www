@@ -10,6 +10,8 @@ var http = require('http');
 var request = require('request');
 var WebSocket = require('ws')
 
+const {generateMessage} = require('./message')
+
 /**
  * Get port from environment and store in Express.
  */
@@ -45,17 +47,10 @@ io.on('connection', function (socket) {
   */
   //---------- Event Emmiters ----------
 
-  socket.emit('newMessage',{
-    from:"Admin",
-    text:"Welcome to the chat",
-    createAt:new Date().getTime()
-  })
+  socket.emit('newMessage',generateMessage('Admin','Welcome to the chat'))
 
-  socket.broadcast.emit('newMessage',{
-    from:"Admin",
-    text:"A new user joined the chat",
-    createAt:new Date().getTime()
-  });
+  socket.broadcast.emit('newMessage',generateMessage('Admin','A new user joined the chat'));
+
   //---------- Event Listeners ----------
   socket.on('disconnect', function () {
     console.log("\nSocket disconnected");
@@ -64,26 +59,20 @@ io.on('connection', function (socket) {
   socket.on('createMessage', function(message){
     console.log('createMessage event listened',message);
     //Cuando me llega un mail o mensaje, envío a todos los ususarios el update
+
+    io.emit('newMessage',generateMessage(message.from,message.text))
     /*
-    io.emit('newMessage',{
-      //Uso los parametros que me llegan del cliente
-      from:message.from,
-      to:message.to,
-      createdAt:new Date().getTime()
-    })
-    */
     //Cuando me llega un mail o mensaje, envío a todos los ususarios MENOS A MI
     socket.broadcast.emit('newMessage',{
       from:message.from,
       to:message.to,
       createdAt:new Date().getTime()
     })
+    */
   })
 
 
   //---------- --------------- ----------
-
-
 
 });
 
